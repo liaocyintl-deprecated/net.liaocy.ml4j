@@ -18,7 +18,7 @@ import net.liaocy.ml4j.common.Language;
 import net.liaocy.ml4j.nlp.dict.Paragraph;
 import net.liaocy.ml4j.nlp.dict.Sentence;
 import net.liaocy.ml4j.nlp.dict.Term;
-import net.liaocy.ml4j.nlp.dict.Terms;
+import net.liaocy.ml4j.nlp.dict.Sentence;
 
 /**
  *
@@ -46,7 +46,7 @@ public class Morpheme {
         }
     }
 
-    public Terms segment(String text) {
+    public Sentence segment(String text) {
         switch (this.lang) {
             case JA_JP:
 
@@ -57,8 +57,8 @@ public class Morpheme {
         return null;
     }
 
-    private  Terms EN_US(String text) {
-        Terms terms = new Terms();
+    private  Sentence EN_US(String text) {
+        Sentence terms = new Sentence();
         this.annotation = new Annotation(text);
         this.pipeline.annotate(this.annotation);
         List<CoreMap> sens = this.annotation.get(CoreAnnotations.SentencesAnnotation.class);

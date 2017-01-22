@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import net.liaocy.ml4j.common.Language;
 import net.liaocy.ml4j.exception.NotFoundTermIDException;
+import net.liaocy.ml4j.nlp.dict.Sentence;
 import net.liaocy.ml4j.nlp.dict.Term;
 import net.liaocy.ml4j.nlp.morpheme.Morpheme;
 
@@ -35,9 +36,10 @@ public class Test {
 //        for (List<HasWord> sentence : dp) {
 //          System.out.println(sentence);
 //        }
-        Predict pre = new Predict("model1");
-        pre.getWordVector(0);
-        pre.getWordsNearest(0, 3);
+        Predict pre = new Predict("newyork");
+//        pre.getWordVector(0);
+        Sentence sentence = pre.getWordsNearest(0, 10);
+        System.out.println(sentence);
     }
 
 

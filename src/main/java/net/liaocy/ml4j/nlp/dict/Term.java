@@ -141,6 +141,6 @@ public class Term {
     
     @Override
     public String toString(){
-        return this.id + "," + this.getSurface() + "," + this.getPOS();
+        return this.id + "," + this.getSurface() + "," + this.getPOS() + "," + this.getSimilarity();
     }
 }

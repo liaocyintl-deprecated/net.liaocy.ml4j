@@ -11,15 +11,24 @@ import java.util.ArrayList;
  *
  * @author liaocy
  */
-public class Sentence extends ArrayList<Term>{
-    
-    
-    @Override
-    public String toString(){
-        String output = "";
-        for(Term term: this){
-            output += term.toString() + " ";
+public class Sentence extends ArrayList<Term> {
+
+    public String joinIdByComma() {
+        String result = "";
+        for(Term term : this){
+            result += term.getID() + ",";
         }
-        return output;
+        if(result.length() > 1){
+            result = result.substring(0,result.length()-1);
+        }
+        return result;
+    }
+    
+    public String toString(){
+        String str = "";
+        for(Term term : this){
+            str += term.toString() + ";";
+        }
+        return str;
     }
 }

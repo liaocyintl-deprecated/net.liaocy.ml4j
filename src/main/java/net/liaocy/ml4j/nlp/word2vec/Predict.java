@@ -16,7 +16,7 @@ import java.util.Collection;
 import net.liaocy.ml4j.db.Mongo;
 import net.liaocy.ml4j.exception.NotFoundTermIDException;
 import net.liaocy.ml4j.nlp.dict.Term;
-import net.liaocy.ml4j.nlp.dict.Terms;
+import net.liaocy.ml4j.nlp.dict.Sentence;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 
@@ -51,10 +51,10 @@ public class Predict {
             System.out.println(scalar);
         }
     }
-    public Terms getWordsNearest(int wordId, int n) throws NotFoundTermIDException{
+    public Sentence getWordsNearest(int wordId, int n) throws NotFoundTermIDException{
         Collection<String> lsts = this.vec.wordsNearest(String.valueOf(wordId), n);
         Term term;
-        Terms terms = new Terms();
+        Sentence terms = new Sentence();
         double simu;
         for(String lst : lsts){
             term = new Term(Integer.parseInt(lst));
