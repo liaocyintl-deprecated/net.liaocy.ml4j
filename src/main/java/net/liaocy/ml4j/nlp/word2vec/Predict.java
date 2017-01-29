@@ -17,6 +17,7 @@ import net.liaocy.ml4j.db.Mongo;
 import net.liaocy.ml4j.exception.NotFoundTermIDException;
 import net.liaocy.ml4j.nlp.dict.Term;
 import net.liaocy.ml4j.nlp.dict.Sentence;
+import net.liaocy.ml4j.tfidf.tfidf;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 
@@ -66,5 +67,47 @@ public class Predict {
     }
     public double getCosineSimilarity(int wordId1, int wordId2){
         return this.vec.similarity(String.valueOf(wordId1), String.valueOf(wordId2));
+    }
+    public double[] getAverageSentenceVector(Sentence sentence){
+        double[] vec = new double[this.vec.getLayerSize()];
+        int count = 0;
+        for(Term term : sentence){
+            double[] wordvec = this.vec.getWordVector(String.valueOf(term.getID()));
+            if(wordvec != null && vec.length == wordvec.length) {
+                for(int i = 0; i < vec.length; i++){
+                    count++;
+                    vec[i] += wordvec[i];
+                }
+            }
+        }
+        if(count == 0){
+            return null;
+        }
+        for(int i = 0; i < vec.length; i++){
+            vec[i] = vec[i] / count;
+        }
+        return vec;
+    }
+    public double[] getIdfWeightedAverageSentenceVector(Sentence sentence, tfidf tfidf){
+        double[] vec = new double[this.vec.getLayerSize()];
+        double countWeight = 0;
+        
+        for(Term term : sentence){
+            double[] wordvec = this.vec.getWordVector(String.valueOf(term.getID()));
+            double weight = tfidf.getIdf(term.getID());
+            if(wordvec != null && vec.length == wordvec.length) {
+                for(int i = 0; i < vec.length; i++){
+                    countWeight += weight;
+                    vec[i] += wordvec[i] * weight;
+                }
+            }
+        }
+        if(countWeight == 0){
+            return null;
+        }
+        for(int i = 0; i < vec.length; i++){
+            vec[i] = vec[i] / countWeight;
+        }
+        return vec;
     }
 }

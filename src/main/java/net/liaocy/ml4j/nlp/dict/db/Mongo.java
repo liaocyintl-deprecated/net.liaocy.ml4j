@@ -5,19 +5,27 @@
  */
 package net.liaocy.ml4j.nlp.dict.db;
 
-
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Filters.eq;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
 /**
  *
  * @author liaocy
  */
 public class Mongo {
+
+    static Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+
+    static {
+        root.setLevel(Level.ERROR);
+    }
 
     private static MongoClient client = null;
     private static String dbName = "dict";

@@ -7,6 +7,7 @@ package net.liaocy.ml4j.nlp.dict;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import java.util.Arrays;
 import java.util.List;
 import net.liaocy.ml4j.common.Language;
@@ -70,16 +71,22 @@ public class Term {
             throw new NullPointerException("Not Found This Term ID");
         }
     }
+    
+    private synchronized int getNextSequence(String name) {
+        MongoCollection<Document> colCounter = this.db.getCollection("counters");
+        Document find = new Document("_id", name);
+        Document update = new Document("$inc", new Document("seq", 1));
+        Document obj = colCounter.findOneAndUpdate(find, update);
+        return obj.getInteger("seq");
+    }
 
     private void findOrInsertTermBySurfacePosLang() {
         Document query = new Document("s", this.surface).append("p", this.pos).append("l", this.lang.getIndex());
         Document docTerm = this.colTerm.find(query).first();
         if (docTerm == null) {
-            synchronized (this) {
-                this.id = (int) colTerm.count();
-                query.append("id", this.id);
-                colTerm.insertOne(query);
-            }
+            this.id = getNextSequence("termid");
+            query.put("id", this.id);
+            this.colTerm.insertOne(query);
         } else {
             this.id = docTerm.getInteger("id");
             

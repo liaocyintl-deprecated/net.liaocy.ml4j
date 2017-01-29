@@ -23,6 +23,7 @@ import static java.lang.Math.log;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import net.liaocy.ml4j.db.Mongo;
 import org.bson.Document;
@@ -38,12 +39,17 @@ public class tfidf {
     private HashMap<Integer, HashMap<Integer, Integer>> wordDocCount;
     private HashMap<Integer, Integer> docCount;
     private HashMap<Integer, Integer> wordCount;
+    private String modelName;
+    private Double idfMax = 0.;
+    private Double idfMin = 100.;
 
-    public tfidf() {
+    public tfidf(String modelName) {
         wordCount = new HashMap<>();
         docCount = new HashMap<>();
         wordDocCount = new HashMap<>();
+        this.modelName = modelName;
     }
+    
 
     public void add(int wordId, int docId) {
         if (!docCount.containsKey(docId)) {
@@ -74,39 +80,57 @@ public class tfidf {
         }
         return 0.;
     }
+    
+    public double getNormalize(int wordId) {
+         if (this.wordDocCount.containsKey(wordId)) {
+            double idf = this.getIdf(wordId);
+            return  (idf - this.idfMin) / (this.idfMax - this.idfMin);
+         }
+         return 0.;
+    }
 
-    public void save(String modelName) throws IOException {
+    public void save() throws IOException {
         MongoDatabase db = Mongo.getDB();
         GridFSBucket gridFSBucket = GridFSBuckets.create(db, "tfidfmodels");
 
-        GridFSFile gfsfi = gridFSBucket.find(new Document("filename", modelName)).first();
+        GridFSFile gfsfi = gridFSBucket.find(new Document("filename", this.modelName)).first();
         if (gfsfi != null) {
             ObjectId id = gfsfi.getObjectId();
             gridFSBucket.delete(id);
         }
+        
+        for(Entry<Integer, Integer> word : wordCount.entrySet()){
+            double idf = this.getIdf(word.getKey());
+            this.idfMax = Math.max(this.idfMax, idf);
+            this.idfMin = Math.min(this.idfMax, idf);
+        }
 
-        try (GridFSUploadStream uploadStream = gridFSBucket.openUploadStream(modelName)) {
+        try (GridFSUploadStream uploadStream = gridFSBucket.openUploadStream(this.modelName)) {
             try (ObjectOutputStream o = new ObjectOutputStream(uploadStream)) {
                 o.writeObject(this.wordDocCount);
                 o.writeObject(this.docCount);
                 o.writeObject(this.wordCount);
+                o.writeObject(this.idfMax);
+                o.writeObject(this.idfMin);
             }
         }
 
         System.out.println("Save Model Successed!");
     }
 
-    public void load(String modelName) throws IOException, ClassNotFoundException {
+    public void load() throws IOException, ClassNotFoundException {
         MongoDatabase db = Mongo.getDB();
         GridFSBucket gridFSBucket = GridFSBuckets.create(db, "tfidfmodels");
-        try (GridFSDownloadStream stream = gridFSBucket.openDownloadStreamByName(modelName)) {
+        try (GridFSDownloadStream stream = gridFSBucket.openDownloadStreamByName(this.modelName)) {
             try (ObjectInputStream objIn = new ObjectInputStream(stream)) {
                 this.wordDocCount = (HashMap) objIn.readObject();
                 this.docCount = (HashMap) objIn.readObject();
                 this.wordCount = (HashMap) objIn.readObject();
+                this.idfMax = objIn.readDouble();
+                this.idfMin = objIn.readDouble();
             }
         }
 
-        System.out.println("Loaded TFIDF Model: " + modelName);
+        System.out.println("Loaded TFIDF Model: " + this.modelName);
     }
 }
