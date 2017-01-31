@@ -9,26 +9,18 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
-import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.GridFSUploadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import static java.lang.Math.log;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import net.liaocy.ml4j.db.Mongo;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 
 /**
  *
@@ -81,7 +73,7 @@ public class tfidf {
         return 0.;
     }
     
-    public double getNormalize(int wordId) {
+    public double getNormalizeIdf(int wordId) {
          if (this.wordDocCount.containsKey(wordId)) {
             double idf = this.getIdf(wordId);
             return  (idf - this.idfMin) / (this.idfMax - this.idfMin);
@@ -100,7 +92,7 @@ public class tfidf {
         }
         
         for(Entry<Integer, Integer> word : wordCount.entrySet()){
-            double idf = this.getIdf(word.getKey());
+            double idf = this.getIdf(word.getValue());
             this.idfMax = Math.max(this.idfMax, idf);
             this.idfMin = Math.min(this.idfMax, idf);
         }
@@ -110,8 +102,8 @@ public class tfidf {
                 o.writeObject(this.wordDocCount);
                 o.writeObject(this.docCount);
                 o.writeObject(this.wordCount);
-                o.writeObject(this.idfMax);
-                o.writeObject(this.idfMin);
+                o.writeDouble(this.idfMax.doubleValue());
+                o.writeDouble(this.idfMin.doubleValue());
             }
         }
 

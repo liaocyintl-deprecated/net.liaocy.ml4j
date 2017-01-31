@@ -25,11 +25,14 @@ import net.liaocy.ml4j.nlp.morpheme.Morpheme;
 public class Test {
 
     public static void main(String[] args) throws IOException, NotFoundTermIDException {
-        Matrix b = Matrix.random(300,300);
-        SingularValueDecomposition svd = b.svd();
-        Matrix U =svd.getU();
-        Matrix V = svd.getV();
-        System.out.println("here");
+//        Matrix b = Matrix.random(300,300);
+//        SingularValueDecomposition svd = b.svd();
+//        Matrix U =svd.getU();
+//        Matrix V = svd.getV();
+//        System.out.println("here");
+        Predict predict = new Predict("newyork2");
+        Sentence sen = predict.getWordsNearest(167, 50);
+        System.out.println(sen);
     }
 
 

@@ -94,10 +94,10 @@ public class Predict {
         
         for(Term term : sentence){
             double[] wordvec = this.vec.getWordVector(String.valueOf(term.getID()));
-            double weight = tfidf.getIdf(term.getID());
+            double weight = tfidf.getNormalizeIdf(term.getID());
             if(wordvec != null && vec.length == wordvec.length) {
+                countWeight += weight;
                 for(int i = 0; i < vec.length; i++){
-                    countWeight += weight;
                     vec[i] += wordvec[i] * weight;
                 }
             }
@@ -105,9 +105,28 @@ public class Predict {
         if(countWeight == 0){
             return null;
         }
+        if(sentence.size() == 1){
+            countWeight = 1;
+        }
         for(int i = 0; i < vec.length; i++){
             vec[i] = vec[i] / countWeight;
         }
         return vec;
+    }
+    public double getIdfSentenceAverageWeight(Sentence sentence, tfidf tfidf){
+        double countWeight = 0;
+        double count = 0.;
+        for(Term term : sentence){
+            double[] wordvec = this.vec.getWordVector(String.valueOf(term.getID()));
+            double weight = tfidf.getNormalizeIdf(term.getID());
+            if(wordvec != null) {
+                countWeight += weight;
+                count++;
+            }
+        }
+        if(count == 0){
+            return 0;
+        }
+        return countWeight / count;
     }
 }

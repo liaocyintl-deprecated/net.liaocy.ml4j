@@ -8,12 +8,25 @@ package net.liaocy.ml4j.nlp.dict;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import net.liaocy.ml4j.exception.NotFoundTermIDException;
 
 /**
  *
  * @author liaocy
  */
 public class Sentence extends ArrayList<Term> {
+    
+    public Sentence(){
+        
+    }
+    
+    public Sentence(List<Integer> termIds) throws NotFoundTermIDException{
+        Term term;
+        for(Integer termId : termIds){
+            term = new Term(termId);
+            this.add(term);
+        }
+    }
 
     public String joinIdByComma() {
         String result = "";
@@ -33,6 +46,14 @@ public class Sentence extends ArrayList<Term> {
             str += term.toString() + ";";
         }
         return str;
+    }
+    
+    public String toSentence(){
+        String sentence = "";
+        for(Term term : this){
+            sentence += term.getSurface() + " ";
+        }
+        return sentence;
     }
     
     @Override

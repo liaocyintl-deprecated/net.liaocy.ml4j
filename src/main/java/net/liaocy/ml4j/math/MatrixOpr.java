@@ -8,6 +8,7 @@ package net.liaocy.ml4j.math;
 import Jama.Matrix;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +31,27 @@ public class MatrixOpr {
 
     public static Matrix joinRow(Matrix m0, Matrix m1) {
         return new Matrix(combine(m0.getArray(), m1.getArray()));
+    }
+    
+    public static void printMatrixToCSV(String path, Matrix m, List<String> rowDescriptions) {
+        try {
+            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path, true), "UTF-8");
+            double[][] matrix = m.getArray();
+            String str = "";
+            int i = 0;
+            for (double[] row : matrix) {
+                str = "";
+                for (double cell : row) {
+                    str += cell + ",";
+                }
+                if (str != null && str.length() > 0 && str.charAt(str.length() - 1) == ',') {
+                    writer.write(str + rowDescriptions.get(i++).replaceAll(",", " ") + "\r\n");
+                }
+            }
+            writer.close();
+        } catch (Exception ex) {
+
+        }
     }
 
     public static void printMatrixToCSV(String path, Matrix m) {

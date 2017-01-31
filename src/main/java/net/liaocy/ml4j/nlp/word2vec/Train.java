@@ -44,8 +44,8 @@ public class Train {
         //pos tags -- end
         this.train(sens.toArray(new Sentence[sens.size()]), lang, modelName);
     }
-
-    public void train(Sentence[] sentences, Language lang, String modelName) throws IOException {
+    
+    public void train(Sentence[] sentences, Language lang, String modelName){
         //pos tags
         Collection<String> commaSentences = new ArrayList<>();
         String commaSentence;
@@ -56,6 +56,10 @@ public class Train {
             }
         }
         //pos tags -- end
+        this.train(sentences, lang, modelName);
+    }
+
+    public void train(Collection<String> commaSentences, Language lang, String modelName) throws IOException {
 
         System.out.println("Load & Vectorize Sentences....");
         SentenceIterator iter = new CollectionSentenceIterator(commaSentences);

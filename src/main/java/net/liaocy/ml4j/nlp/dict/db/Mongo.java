@@ -10,10 +10,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Filters.eq;
 import com.mongodb.client.model.UpdateOptions;
+import java.util.logging.Level;
 import org.bson.Document;
-import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,10 +20,12 @@ import ch.qos.logback.classic.Logger;
  */
 public class Mongo {
 
-    static Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-
+//    static Logger mongoLogger = Logger.getLogger("com.mongodb");
     static {
-        root.setLevel(Level.ERROR);
+//        mongoLogger.setLevel(Level.SEVERE);
+        System.setProperty("DEBUG.MONGO", "false");
+        System.setProperty("DB.TRACE", "false");
+        Logger.getLogger("com.mongodb").setLevel(Level.OFF);
     }
 
     private static MongoClient client = null;
